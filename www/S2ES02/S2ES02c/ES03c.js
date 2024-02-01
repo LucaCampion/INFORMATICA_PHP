@@ -6,7 +6,7 @@ if (!Number.isNaN(num1) && !Number.isNaN(num2)) {
     let risultato;
     switch (operazione) {
         case '+':
-            risultato = num1*1 + num2*1;
+            risultato = num1 + num2;
             break;
         case '-':
             risultato = num1 - num2;
@@ -23,7 +23,7 @@ if (!Number.isNaN(num1) && !Number.isNaN(num2)) {
             }
             break;
         case '**':
-            risultato = num1**num2;
+            risultato = Math.pow(num1, num2);
             break;
         default:
             console.log("Errore: Operazione non valida.");
