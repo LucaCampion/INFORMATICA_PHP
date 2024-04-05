@@ -3,7 +3,7 @@ let num2 = prompt("Inserisci il secondo numero:");
 let operazione = prompt("Inserisci un'operazione matematica tra '+', '-', '*', '/', '**':");
 const operazioni= {
 	somma:(a, b) => {
-		return `${a} + ${b} = ${a+b}`;
+		return `${a} + ${b} = ${a*1+b*1}`;
 	},
 	sottrazione:(a, b) => {
 		return `${a} - ${b} = ${a-b}`
