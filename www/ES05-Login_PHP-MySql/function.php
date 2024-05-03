@@ -1,61 +1,41 @@
 <?php
 
-function _pdodb_connection() {
-  try {
-    $hostname = "localhost";
-    $dbname = "secure_login";
-    $user = "sec_user";
-    $pass = "FFcGZr59zAa2BEWU";
-    $pdodb = new PDO ("mysql:host=$hostname;dbname=$dbname", $user, $pass);
-    return array(true, $pdodb);
-  } catch (PDOException $e) {
-    return array(false, "Errore: " . $e->getMessage());
+function login($u, $p) {
+  // Connessione al database
+  $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+  // Verifica della connessione
+  if (!$conn) {
+      $ret_msg = "Connessione fallita: "; // L'utente è autenticato con successo
+      $ret_val = false; 
+      return array($ret_val, $ret_msg);
+      //die("Connessione fallita: " . mysqli_connect_error());
   }
-}
-function login($email, $password) {
-  
-    if(! isset($email, $password)) 
-      return array(false, "Inserire le proprie credenziali e premere il pulsante login.");
-      
-    if(empty($email) || empty($password)) 
-      return array(false, "Inserire le proprie credenziali e premere il pulsante login.");
-    
-    list($retval,$pdodb)=_pdodb_connection();
-    if(!$retval) {return array(false, $pdodb);} //TODO: debug only
-  
-    try {
-      $sql = "SELECT id, username, password, salt FROM members WHERE email=:email LIMIT 1";
-      $stmt = $pdodb->prepare($sql);
-      $retval = $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-      $retval = $stmt->execute();
-      $rowCount = $stmt->rowCount();
-  
-      if($rowCount == 1) {
-        //l'utente esiste
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $db_userid = $row['id'];
-        $db_username = $row['username'];
-        $db_password = $row['password'];
-        // Verifica che la password memorizzata nel database corrisponda alla password fornita dall'utente.
-      if($db_password == $password) { 
-        // Password corretta! Login eseguito con successo.
-        $_SESSION['userid'] = $db_userid; 
-        $_SESSION['username'] = $db_username;
-        return array(true, "Login eseguito correttamente");
-      } else {
-        // Password sbagliata.
-        $_SESSION['userid'] = null;
-        return array(false, "Attenzione! Password sbagliata.");
-      }
-    } else {
-      // L'utente inserito non esiste.
-      $_SESSION['userid'] = null;
-      return array(false, "Attenzione! L'utente inserito non esiste.");
-    }  
-    
-  } catch (Exception $e) {
-    return array(false, "Attenzione! Errore: " . $e->getMessage());
+
+  // Esegui la query per verificare le credenziali dell'utente
+  $query = "SELECT * FROM utente WHERE username = '$u' AND password = '$p'";
+  $result = mysqli_query($conn, $query);
+
+  // Verifica se la query ha restituito risultati
+  if (mysqli_num_rows($result) > 0) {
+    $ret_msg = "Login riuscito. Benvenuto!"; // L'utente è autenticato con successo
+    $ret_val = true; 
+    //echo "Login riuscito. Benvenuto!"; // L'utente è autenticato con successo
+  } else {
+    $ret_msg = "Attenzione le credenziali non sono valide. Riprova."; // L'utente è autenticato con successo
+    $ret_val = false; 
+    //echo "Credenziali non valide. Riprova."; // L'utente non è autenticato
   }
+
+  // Chiudere la connessione quando non è più necessaria
+  mysqli_close($conn);
+  return array($ret_val, $ret_msg);
 }
 
+
+//-------------------------------------
+//-------------------------------------
+//-------------------------------------
+
+
+?>
 
